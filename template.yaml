@@ -1,0 +1,72 @@
+# SortSmart SAM template — serverless waste-segregation advisor.
+#
+# Built with the AWS SAM CLI (open-source: github.com/aws/aws-sam-cli).
+#   sam build      # package the Lambda function
+#   sam deploy --guided   # ship it (needs an AWS account; optional for judging)
+#
+# Resources:
+#   - Lambda function behind API Gateway (HTTP API): GET /advise, GET /stats
+#   - DynamoDB table for the weekly diversion log (pay-per-request: $0 idle)
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SortSmart — household waste segregation advisor (Environmental Hacks)
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        SORTSMART_TABLE: !Ref SortSmartTable
+
+Resources:
+  SortSmartApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+
+  SortSmartFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: sortsmart-advise
+      CodeUri: ./
+      Handler: lambda.handler.lambda_handler
+      Runtime: python3.12
+      Events:
+        Advise:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref SortSmartApi
+            Path: /advise
+            Method: get
+        Stats:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref SortSmartApi
+            Path: /stats
+            Method: get
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref SortSmartTable
+
+  SortSmartTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: sortsmart-weekly-log
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the SortSmart HTTP API
+    Value: !Sub https://${SortSmartApi}.execute-api.${AWS::Region}.amazonaws.com/prod
