@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SortSmart Business Advisor — Pitch Deck · AMD ACT III</title>
+<style>
+  :root { --bg:#0b0e14; --panel:#141a26; --line:#232d42; --txt:#eef2fa; --dim:#93a0b8;
+          --green:#3ddc84; --blue:#4da3ff; --amber:#f5b544; --red:#ff5d5d; --amd:#ed1c24; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:var(--txt); font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;
+         display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #deck { width:min(1100px,94vw); aspect-ratio:16/9; position:relative; }
+  .slide { position:absolute; inset:0; background:var(--panel); border:1px solid var(--line); border-radius:18px;
+           padding:56px 64px; display:none; flex-direction:column; justify-content:center; overflow:hidden; }
+  .slide.active { display:flex; animation:fade .35s ease; }
+  @keyframes fade { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none;} }
+  .kicker { font-size:13px; letter-spacing:.22em; text-transform:uppercase; color:var(--amd); margin-bottom:14px; font-weight:700; }
+  h1 { font-size:52px; line-height:1.12; margin-bottom:18px; letter-spacing:-.01em; }
+  h1 .hl { color:var(--green); }
+  h2 { font-size:38px; margin-bottom:20px; letter-spacing:-.01em; }
+  p.lead { font-size:20px; color:var(--dim); line-height:1.6; max-width:820px; }
+  .cols { display:flex; gap:28px; margin-top:8px; }
+  .col { flex:1; }
+  .stat { background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:14px; }
+  .stat .v { font-size:36px; font-weight:800; color:var(--green); }
+  .stat .k { font-size:13px; color:var(--dim); text-transform:uppercase; letter-spacing:.08em; margin-top:6px; }
+  .stat .d { font-size:14px; color:var(--dim); margin-top:6px; line-height:1.5; }
+  ul.ticks { list-style:none; margin-top:6px; }
+  ul.ticks li { font-size:19px; line-height:1.5; margin-bottom:14px; padding-left:34px; position:relative; color:#d7deeb; }
+  ul.ticks li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:800; }
+  .quote { background:var(--bg); border-left:4px solid var(--blue); border-radius:0 12px 12px 0; padding:20px 24px;
+           font-size:20px; line-height:1.6; margin:18px 0; font-style:italic; color:#d7deeb; }
+  .quote .who { display:block; margin-top:10px; font-size:14px; color:var(--dim); font-style:normal; }
+  .arch { font-family:ui-monospace,Menlo,monospace; font-size:14.5px; line-height:1.9; background:var(--bg);
+          border:1px solid var(--line); border-radius:12px; padding:22px 26px; color:#c9d4e8; margin-top:10px; }
+  .arch .g { color:var(--green); } .arch .b { color:var(--blue); } .arch .a { color:var(--amber); }
+  .pill { display:inline-block; font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+          background:#1a2334; border:1px solid var(--line); color:var(--dim); border-radius:999px; padding:6px 14px; margin:0 6px 10px 0; }
+  .pill.hot { color:var(--amd); border-color:var(--amd); }
+  #nav { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); display:flex; gap:10px; align-items:center;
+         background:#10151f; border:1px solid var(--line); border-radius:999px; padding:8px 18px; font-size:13px; color:var(--dim); }
+  #nav button { background:none; border:none; color:var(--txt); font-size:18px; cursor:pointer; padding:2px 10px; }
+  #nav button:hover { color:var(--blue); }
+  .foot { position:absolute; bottom:22px; left:64px; right:64px; display:flex; justify-content:space-between;
+          font-size:12px; color:var(--dim); letter-spacing:.06em; }
+  .big-q { font-size:30px; line-height:1.5; font-style:italic; color:#d7deeb; }
+  .cta { margin-top:26px; font-size:22px; }
+  .cta a { color:var(--blue); text-decoration:none; }
+  @media print { #nav { display:none; } }
+</style>
+</head>
+<body>
+<div id="deck">
+
+  <!-- 1 · Title -->
+  <section class="slide active">
+    <div class="kicker">AMD Developer Hackathon: ACT III · Reinvent Commerce · Team ArcOmega</div>
+    <h1>SortSmart <span class="hl">Business Advisor</span></h1>
+    <p class="lead">An AI advisor that helps businesses cut packaging &amp; waste costs — every dollar figure grounded in a verified rule engine, with the LLM layer running on <strong>AMD infrastructure</strong>.</p>
+    <div style="margin-top:26px">
+      <span class="pill hot">AMD Developer Cloud</span><span class="pill">ROCm</span><span class="pill">vLLM</span><span class="pill">Python</span><span class="pill">Open Source</span>
+    </div>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>1 / 9</span></div>
+  </section>
+
+  <!-- 2 · Problem -->
+  <section class="slide">
+    <div class="kicker">The problem</div>
+    <h2>Businesses bleed money on waste<br>they can't see.</h2>
+    <div class="cols">
+      <div class="col">
+        <div class="stat"><div class="v">$57 / ton</div><div class="k">Landfill tipping fee</div><div class="d">US national average. Recycling costs $35, composting $30 — but most businesses never compare.</div></div>
+        <div class="stat"><div class="v">30M+</div><div class="k">US small businesses</div><div class="d">Making packaging decisions daily with zero data and zero tooling.</div></div>
+      </div>
+      <div class="col">
+        <div class="stat"><div class="v">$10k+</div><div class="k">Sustainability audit</div><div class="d">What a consultant charges — so 99% of businesses never get one.</div></div>
+        <div class="stat"><div class="v">$0</div><div class="k">Tools for the rest</div><div class="d">No owner has ever had a packaging ROI answer at their fingertips. Until now.</div></div>
+      </div>
+    </div>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>2 / 9</span></div>
+  </section>
+
+  <!-- 3 · Solution -->
+  <section class="slide">
+    <div class="kicker">The solution</div>
+    <h2>Ask in plain English.<br>Get a dollar answer.</h2>
+    <div class="quote">"We ship 2,000 packages a month in plastic mailers — what should we switch to?"
+      <span class="who">→ SortSmart: "Bottom line: switching to padded paper mailers saves ~$1,200/yr and makes every package curbside-recyclable."</span></div>
+    <ul class="ticks">
+      <li><strong>Full business briefs</strong> — 0–100 sustainability score with transparent breakdown</li>
+      <li><strong>Ranked recommendations</strong> — every one with projected annual savings</li>
+      <li><strong>Zero hallucinated numbers</strong> — the LLM narrates, the rule engine calculates</li>
+    </ul>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>3 / 9</span></div>
+  </section>
+
+  <!-- 4 · How it works -->
+  <section class="slide">
+    <div class="kicker">How it works</div>
+    <h2>Three layers. Each does what it does best.</h2>
+    <div class="arch"><span class="g">┌─ Deterministic rule engine ────────┐</span>  waste knowledge base · sorting advisor · tracking
+<span class="g">└────────────────────────────────────┘</span>
+<span class="b">┌─ Business intelligence layer ────────┐</span>  EPA-grounded cost models · 0–100 scoring · ROI ranking
+<span class="b">└────────────────────────────────────┘</span>
+<span class="a">┌─ LLM advisor (AMD-hosted) ───────────┐</span>  synthesizes grounded figures into conversational advice
+<span class="a">└────────────────────────────────────┘</span></div>
+    <p class="lead" style="margin-top:16px; font-size:17px;"><strong style="color:var(--txt)">Design principle:</strong> the LLM never invents a number. All figures are US national averages, labeled as estimates.</p>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>4 / 9</span></div>
+  </section>
+
+  <!-- 5 · AMD angle -->
+  <section class="slide">
+    <div class="kicker">The AMD angle</div>
+    <h2>The intelligence runs on AMD.</h2>
+    <ul class="ticks">
+      <li><strong>LLM served with vLLM on ROCm-ready AMD Instinct GPUs</strong> via AMD Developer Cloud</li>
+      <li><strong>Config change only</strong> — OpenAI-compatible API means zero code changes to move backends</li>
+      <li><strong>Meaningful workload, not a checkbox</strong> — every answer is synthesized by the model; it <em>is</em> the product</li>
+    </ul>
+    <div class="arch">LLM_BASE_URL:  tokenharbor.ai/v1  <span class="a">→</span>  <span class="g">http://&lt;amd-gpu&gt;:8000/v1</span>
+LLM_MODEL:    deepseek-v4.1-flash   <span class="a">→</span>  <span class="g">meta-llama/Llama-3.1-8B-Instruct</span></div>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>5 / 9</span></div>
+  </section>
+
+  <!-- 6 · Business value -->
+  <section class="slide">
+    <div class="kicker">Business value</div>
+    <h2>Real dollars, not vibes.</h2>
+    <div class="cols">
+      <div class="col">
+        <div class="stat"><div class="v">$1–5k<span style="font-size:20px">/yr</span></div><div class="k">Typical packaging savings</div><div class="d">Identified for a mid-size shipper switching mailer types.</div></div>
+        <div class="stat"><div class="v">−40%</div><div class="k">Disposal cost cut</div><div class="d">Re-routing waste: $57/ton landfill → $35 recycle / $30 compost.</div></div>
+      </div>
+      <div class="col">
+        <div class="stat"><div class="v">0–100</div><div class="k">Sustainability score</div><div class="d">Explainable metric for marketing, ESG reporting, customer trust — no $10k audit.</div></div>
+        <div class="stat"><div class="v">Free</div><div class="k">Price to the business</div><div class="d">A sustainability analyst on every owner's phone, at zero cost.</div></div>
+      </div>
+    </div>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>6 / 9</span></div>
+  </section>
+
+  <!-- 7 · Demo -->
+  <section class="slide">
+    <div class="kicker">Live demo</div>
+    <h2>See it answer.</h2>
+    <p class="lead">The demo walks through three moments:</p>
+    <ul class="ticks" style="margin-top:18px">
+      <li><strong>Ask</strong> — "We ship 2,000 packages a month in plastic mailers…" with business profile inputs</li>
+      <li><strong>Score</strong> — the 0–100 sustainability ring, cost breakdown, and ranked recommendations appear</li>
+      <li><strong>Save</strong> — the advisor quantifies the switch: ~$1,200/yr, curbside-recyclable, step-by-step next actions</li>
+    </ul>
+    <p class="lead" style="margin-top:18px;">Backend: Python stdlib only · 14/14 tests passing · UI: single self-contained page.</p>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>7 / 9</span></div>
+  </section>
+
+  <!-- 8 · What's next -->
+  <section class="slide">
+    <div class="kicker">What's next</div>
+    <h2>From advisor to autopilot.</h2>
+    <ul class="ticks">
+      <li><strong>Merchant integrations</strong> — pull real packaging data from Shopify / WooCommerce</li>
+      <li><strong>Multi-location benchmarking</strong> — chains compare stores, share what works</li>
+      <li><strong>Learned profiles</strong> — per-business waste patterns sharpen recommendations over time</li>
+      <li><strong>Procurement hooks</strong> — one click from "switch to paper mailers" to supplier quote</li>
+    </ul>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>8 / 9</span></div>
+  </section>
+
+  <!-- 9 · Close -->
+  <section class="slide">
+    <div class="kicker">Team ArcOmega</div>
+    <h1>Waste you can price<br>is waste you can <span class="hl">cut.</span></h1>
+    <p class="lead">SortSmart Business Advisor — grounded AI for commerce, running on AMD.</p>
+    <div class="cta">🔗 github.com/dcain2336/sortsmart</div>
+    <div class="foot"><span>SORTSMART BUSINESS ADVISOR</span><span>9 / 9</span></div>
+  </section>
+
+</div>
+
+<div id="nav">
+  <button id="prev">‹</button><span id="count">1 / 9</span><button id="next">›</button>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+function go(n){i=(n+slides.length)%slides.length;slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+document.getElementById('count').textContent=(i+1)+' / '+slides.length;}
+document.getElementById('prev').onclick=()=>go(i-1);
+document.getElementById('next').onclick=()=>go(i+1);
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')go(i+1);
+if(e.key==='ArrowLeft')go(i-1);if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1);});
+</script>
+</body>
+</html>
