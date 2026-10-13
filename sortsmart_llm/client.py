@@ -73,7 +73,7 @@ class LLMClient:
 
 
 def _mock_reply(messages):
-    """Deterministic offline reply for testing — echoes the grounded facts."""
+    """Deterministic offline reply — clean advisor-style response from grounded facts."""
     last_user = ""
     for m in reversed(messages):
         if m.get("role") == "user":
@@ -81,12 +81,22 @@ def _mock_reply(messages):
             break
     facts = ""
     if "GROUNDED FACTS" in last_user:
-        facts = last_user.split("GROUNDED FACTS")[-1][:600]
-    return (
-        "[MOCK LLM — offline test mode]\n"
-        "Based on the grounded business data, here are my recommendations:\n"
-        f"{facts}\n"
-        "Recommendation: act on the highest-ROI lever first (packaging switch or "
-        "composting), then lift diversion rate with staff training. "
-        "All figures are US national-average estimates."
+        facts = last_user.split("GROUNDED FACTS")[-1]
+    # Parse the facts block into a clean response
+    lines = [l.strip() for l in facts.strip().split("\n") if l.strip()]
+    out = ["Based on your business profile, here is my assessment:\n"]
+    for line in lines:
+        # Skip raw formatting artifacts, keep the substance
+        if line.startswith("Assumption:"):
+            out.append(f"\n_{line}_")
+        elif line.startswith("- ") or line.startswith("Business type:"):
+            out.append(line)
+        elif "monthly disposal cost" in line.lower() or "sustainability score" in line.lower():
+            out.append(f"**{line}**")
+        elif line and not line.startswith("("):
+            out.append(line)
+    out.append(
+        "\nRecommendation: act on the highest-ROI lever first (packaging switch or "
+        "composting), then lift diversion rate with staff training."
     )
+    return "\n".join(out)
