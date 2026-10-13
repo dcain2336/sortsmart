@@ -1,58 +1,97 @@
-# SortSmart — know which bin it goes in
+# SortSmart Business Advisor
 
-Household waste advisor for the **Environmental Hacks** hackathon (WeMakeDevs × AWS, Bharat Builds Tour) — **Track 03: Waste and Energy**.
+**AMD Developer Hackathon: ACT III — Reinvent Commerce track**
 
-Most recycling fails at the bin: one greasy pizza box or plastic bag in the wrong stream contaminates the whole batch. SortSmart answers the question everyone asks standing over the trash — *"which bin does this go in?"* — with the reasoning, so people learn the rules instead of guessing.
+An AI advisor that helps businesses cut waste costs and prove sustainability ROI —
+with every dollar figure grounded in a verified rule engine, and the LLM layer
+designed to run on **AMD infrastructure**.
 
-## What it does
+## The idea
 
-- **Advise:** describe any household item, get the right stream — recycle, compost, e-waste, hazardous, donate, reuse, or landfill — plus *why* and a practical tip. 60+ items in the knowledge base, tuned for the tricky cases (greasy pizza box → compost, plastic bags → store drop-off not curbside, thermal receipts → landfill).
-- **Lambda API:** the same advisor served as a serverless HTTP API (`GET /advise?item=…`, `GET /stats`).
-- **Weekly tracker:** log what you sort, see your household diversion rate — the % of waste kept out of landfill.
+Retailers, restaurants, and shippers make packaging and waste decisions every day
+with no data. SortSmart Business Advisor changes that: ask a plain-English question,
+get a dollar-quantified answer.
 
-## Run it
+> "We ship 2,000 packages a month in plastic mailers — what should we switch to?"
+> → *"Bottom line: switching to padded paper mailers saves ~$1,200/yr and makes
+> every package curbside-recyclable..."*
 
-```bash
-python3 demo.py          # end-to-end demo, 14 checks, exits 0
-python3 -m pytest tests/ # unit tests (needs pytest)
+## Architecture
+
+```
+┌─────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Demo UI    │────▶│   REST API       │────▶│  BusinessAdvisor│
+│  (ui/)      │     │   (api/server.py)│     │  (agent)        │
+└─────────────┘     └──────────────────┘     └────────┬────────┘
+                                                     │
+                              ┌──────────────────────┼──────────────────┐
+                              ▼                      ▼                  ▼
+                     ┌─────────────────┐   ┌─────────────────┐ ┌──────────────┐
+                     │ sortsmart/      │   │sortsmart_biz    │ │ sortsmart_llm│
+                     │ rule engine     │   │ cost models,    │ │ OpenAI-compat│
+                     │ (vendored)      │   │ scoring, ROI    │ │ client       │
+                     └─────────────────┘   └─────────────────┘ └──────────────┘
 ```
 
-Try the advisor directly:
+**Key design principle:** the LLM never invents numbers. The deterministic layer
+(cost models + rule engine) computes every figure; the LLM synthesizes them into
+advice. All cost figures are US national averages, clearly labeled as estimates.
+
+## The AMD angle
+
+The LLM client (`sortsmart_llm/client.py`) speaks the OpenAI-compatible
+`/v1/chat/completions` API and is configured entirely by environment variables:
+
+| Env var | Testing now | AMD Developer Cloud |
+|---|---|---|
+| `LLM_BASE_URL` | `https://tokenharbor.ai/v1` | `http://<gpu-instance>:8000/v1` |
+| `LLM_MODEL` | `deepseek-v4.1-flash:free` | `meta-llama/Llama-3.1-8B-Instruct` |
+| `LLM_API_KEY` | `<key>` | not needed (vLLM default) |
+
+Swapping to AMD-hosted inference is a **config change only** — zero code changes.
+See [`amd/`](amd/) for the full ROCm + vLLM deployment guide.
+
+This satisfies the ACT III requirement that a meaningful part of the workload run
+on AMD infrastructure: the LLM is the product's core intelligence — every answer
+is synthesized by the model — and it runs on AMD Developer Cloud (Instinct GPUs
+via ROCm, served with vLLM).
+
+## Quick start
 
 ```bash
-python3 -c "
-from sortsmart import advise
-for q in ['greasy pizza box', 'AA battery', 'old jacket']:
-    a = advise(q); print(a['emoji'], a['label'], '-', a['item'])"
+# 1. Configure the LLM backend (or use LLM_MOCK=true for offline testing)
+export LLM_BASE_URL="https://tokenharbor.ai/v1"
+export LLM_API_KEY="your-key"
+export LLM_MODEL="deepseek-v4.1-flash:free"
+
+# 2. Run the server
+python3 api/server.py
+# → http://127.0.0.1:8080/
+
+# 3. Run the tests
+python3 -m pytest tests/ -q
 ```
 
-## Where AWS fits
-
-This project is built on **AWS SAM (Serverless Application Model)** — the open-source tool from AWS for defining serverless apps as code:
-
-- `template.yaml` is a real SAM template: a Lambda function (`SortSmartFunction`) behind API Gateway (HTTP API) with a DynamoDB table (`sortsmart-weekly-log`, pay-per-request) for the diversion log.
-- `lambda/handler.py` is the Lambda handler — it serves API Gateway proxy events and writes to DynamoDB when the `SORTSMART_TABLE` env var is set (injected by the template).
-- Verified with the SAM CLI: `sam build` packages the function cleanly (see demo video).
-
-Deploy path (needs an AWS account — free tier covers it): `sam deploy --guided`.
+No dependencies beyond the Python standard library.
 
 ## Project layout
 
 | Path | What |
 |---|---|
-| `sortsmart/knowledge.py` | 60+ item waste-stream knowledge base |
-| `sortsmart/advisor.py` | matching + advice engine |
-| `sortsmart/tracker.py` | weekly diversion log + rate |
-| `lambda/handler.py` | Lambda handler (API Gateway + DynamoDB) |
-| `template.yaml` | SAM template (Lambda + API Gateway + DynamoDB) |
-| `demo.py` | end-to-end demo, exits 0 |
-| `tests/` | unit tests |
+| `sortsmart/` | Vendored SortSmart rule engine (advisor, knowledge base, tracker) |
+| `sortsmart_business/` | Cost models, sustainability scoring (0-100), ROI recommendations |
+| `sortsmart_llm/` | Model-agnostic LLM client, prompts, advisor agent |
+| `api/server.py` | REST API + static UI server (stdlib only) |
+| `ui/index.html` | Demo web interface |
+| `amd/` | AMD Developer Cloud / ROCm deployment guide |
+| `tests/` | Unit tests (14, all passing, no LLM needed) |
 
-## AI tools used
+## API
 
-Built with AI coding assistance (Muse) — code written, tested, and reviewed with an AI pair programmer.
+- `GET /api/health` — backend status + model info
+- `POST /api/ask` — `{"question", "business_type"?, "monthly_shipments"?, "packaging"?}` → answer + grounded figures
+- `POST /api/brief` — business profile → full cost/score/recommendation brief
 
-## Notes for judges
+## License
 
-- New repo, created during the event window (Oct 8–11, 2026).
-- The demo video shows the advisor, the Lambda handler running locally, and `sam build` with the AWS SAM CLI.
+MIT — see [LICENSE](LICENSE).
