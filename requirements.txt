@@ -1,1 +1,3 @@
-# no third-party runtime deps — stdlib only
+# SortSmart Business Advisor — zero third-party dependencies.
+# Everything runs on the Python 3 standard library.
+# Python 3.8+ recommended.
